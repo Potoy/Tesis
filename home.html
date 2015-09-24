@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Volume Render Ver 1.02</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+		<link rel="stylesheet" type="text/css" href="css/styles.css"/>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-colorpicker.css"/>
+    	<link rel="stylesheet" href="css/normalize.css" />
+		<link rel="stylesheet" href="css/jquery-ui.css"/>
+		<link rel="stylesheet" href="css/jquery-ui-slider-pips.css"/>
+		<script src="js/math.min.js"></script>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="js/jquery-ui.min.js"></script>
+		<script src="js/jquery-ui-slider-pips.js"></script>
+		<script src="js/bootstrap.js"></script>
+		<script src="js/bootstrap-colorpicker.js"></script>
+		<script src="js/three.js"></script>
+       	<script src="js/Detector.js"></script> 
+       	<script src="js/stats.min.js"></script>
+        <script src="js/OrbitControls.js"></script>
+        <script src="js/Simpson.js"></script>
+	</head>
+	<body>
+
+	<div class="container-fluid">
+
+
+
+		<div class="row row-offcanvas row-offcanvas-right">
+			<div class="col-xs-12 col-sm-9">
+				<div id="container-webgl">
+					<div><span style="color: #fff">Función de Transferencia</span></div>
+
+					<span id="minimum" style="color:#fff"> 0.0 </span><img id="transferFunctionImg" style="aling:center; width:256px; height:10px; border:solid; border-width: 0.5px; border-color: #FFF; background: rgba(255,255,255,0.01) "/><span id="maximum" style="color:#fff"> 1.0 </span>
+				</div>
+
+			</div>
+			<div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+				<div class="panel-default"> 
+					<div class="panel panel-info pre-scrollable " style="background: #e6e9ee; border-color: #c3cbd6; border-radius: 0px;">
+						<div class="panel-heading" style="background: #344a60; color:#fff; border-color:#c3cbd6; border-top-left-radius: 0px; border-top-right-radius: 0px;">
+							<h3 class="panel-title">
+								<span>
+								Controles Principales
+								</span>
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div class="other-content">
+								
+								<div class="main-content">
+									<div class="col-xs-12">
+										<span id="formula-box">Maximos y Minimos</span><br>
+											<div class="col-xs-12 row-md-8 well well-sm">
+												<div class="row-xs-6 col-md-6">
+													<div class="row-xs-3">
+														<span id="formula-atribs1">xmin:</span><input class="form-control bfh-number input-sm" id="formula-xmin" type="number" value="1">
+													</div>
+													<div class="row-xs-3">
+														<span id="formula-atribs2">ymin:</span><input class="form-control bfh-number input-sm" id="formula-ymin" type="number" value="1">
+													</div>
+													<div class="row-xs-3">
+														<span id="formula-atribs3">zmin:</span><input class="form-control bfh-number input-sm" id="formula-zmin" type="number" value="1">
+													</div>
+												</div>
+												<div class="row-xs-6 col-md-6">
+													<div class="row-xs-2">
+														<span id="formula-atribs5">xmax:</span><input class="form-control bfh-number input-sm" id="formula-xmax" type="number" value="1">
+													</div>
+													<div class="row-xs-2">
+														<span id="formula-atribs6">ymax:</span><input class="form-control bfh-number input-sm" id="formula-ymax" type="number" value="1">
+													</div>
+													<div class="row-xs-2">
+														<span id="formula-atribs7">zmax:</span><input class="form-control bfh-number input-sm" id="formula-zmax" type="number" value="1">
+													</div>
+													
+												</div>
+											</div>
+
+										<div class="col-xs-12 row-xs-8 well well-sm">
+										
+											<div class="btn-group" data-toggle="buttons">
+												<label class="btn btn-primary active">
+												  <input type="radio" name="options" id="option_1" autocomplete="off" value="0" checked>f(x,y,z)
+												</label>
+
+											</div>
+											<br>
+											<br>
+
+											<input class="form-control input-sm" id="formula-Place-1" type"text" value=""/>
+										</div>
+										<span>Numbero de Voxels</span>
+										<div class="col-xs-12 well well-sm">
+											<div class="col-md-12">
+												<span>Tamaño</span><input class="form-control bfh-number input-sm __0" id="slice-per-x" type="number" value="64" max="64"/>
+											</div>
+										</div>
+										<br>
+										<div class="col-xs-12 row-md-12">
+											<span>Funcion de Transferencia</span>
+											<br>
+											 <div class="row-xs-6 well well-sm">
+											 	 <label class="radio-inline">
+  														<input type="radio" name="inlineRadioOptions" id="Normal_f" value="option1">Normal
+												</label>
+												<label class="radio-inline">
+  														<input type="radio" name="inlineRadioOptions" id="Simpson_f" value="option2">Simpson
+												</label>
+												<br>
+												<spam> Tamaño de la Textura</spam>
+												 <select class="form-control" id="texture_size">
+												 	<option value='0'>256</option>
+												 	<option value='1'>512</option>
+												 	<option value='2'>1024</option>
+												 </select>
+											 </div>
+
+										</div>
+										<div class="col-xs-12 row-md-12">
+										<br>
+											
+											<button class="btn btn-primary btn-sm" name="Draw" id="drawButton" type="button">Dibujar</button>
+											<button class="btn btn-primary btn-sm" name="Center" id="Center" type="button">Centrar</button>
+											<button class="btn btn-default btn-sm" id="AnimationSlider">Animado</button>
+
+										</div>
+
+										<div class="col-xs-12">
+										<br> <span>Controles despues de dibujar</span>
+											<div class="row-xs-12">
+											<br>
+												<span id="nameosrange">Rango de Iso Valores</span>
+												<br>
+
+												<div class="sliderMain" id="mainSlider"></div>
+												<br>
+												<span style="display: none;"> Slider Animado</span>
+												<div class="sliderAnimeted" style="display: none;"></div>
+											<br>
+											</div>
+											<br>
+											<span>Iso Valor Seleccionado</span>
+											<div class="row-xs-12">
+												
+												<ul class="SlectedSlider well well-sm">
+									          		<span class="col-md-4 row-xs-3">Posicion: </span><input class="psliderslected col-md-4 row-xs-3" id="numero" type="number" value="0" min="0" max="1024" size="5"><span class="col-md-4 row-xs-3">Ancho: </span><input id="numero" class="wsliderslected col-md-4 row-xs-3" type="number" value="5" min="2" max="512" size="5"><span class="col-md-4 row-xs-3">Color: </span><input class="s_rgbslider_slected col-md-4 row-xs-3" id="numero"type="text" value="FF0000" size="5">
+									          		<span class="col-md-4 row-xs-3">Absorcion: </span><input id="numero" class="osliderslected col-md-4 row-xs-3" type ="number" value="0.1" min ="0.0" step="0.1" max="1.0" size="2">
+									          		<br>
+									          		<br>
+									          		<br>
+									          		<br>
+									          		<br>
+									          	</ul>
+									          	
+											</div>
+											<button type="button" class="btn btn-info btn-sm" id="modal_button" data-toggle="modal" data-target="#Modal-for-sliders">Agregar mas Capas</button>
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="Modal-for-sliders" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+					<div class="modal-content">
+				        <div class="modal-header">
+				          <button type="button" class="close" data-dismiss="modal">&times;</button>
+				          <h4 class="modal-title">Mas Handlers para el Rango de Iso-Values</h4>
+				        </div>
+				        <div class="modal-body well well-sm" style="padding: 3px;">
+				          
+				          <div id="recprops">
+				          <ol id="mainlist">
+				          	<li class="reSlideprops template">
+				          		Posicion: <input class="s pslider" type="number" value="0" min="0" max="1024" size="5" id="modalNumero">, Ancho: <input class="s wslider" type="number" value="5" min="2" max="512" size="5" id="modalNumero">, Color: <input class="s_rgbslider_" id="rgbslider_"type="text" value="#FF0000" size="5">
+				          		, Absorcion: <input class="s oslider" type ="number" value="0.1" min ="0.0" step="0.1" max="1.0" size="2" id="modalNumero"> <button type="button" class="btn btn-primary btn-sm sdelete" id="del_">X</button>
+				          	</li>
+				          </ol>
+				          <button type="button" class="btn btn-primary btn-sm apply">Apply</button>
+				          <button type="button" class="btn btn-primary btn-sm add">+</button>
+				          </div>
+				        </div>
+				        <div class="modal-footer">
+
+				          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				        </div>
+				      </div>
+				</div>
+		</div>
+	</div>
+ 		<script id="fragmentShaderFirstPass" type="x-shader/x-fragment">
+			varying vec3 worldSpaceCoords;
+
+			void main()
+			{
+				//The fragment's world space coordinates as fragment output.
+				gl_FragColor = vec4( worldSpaceCoords.x , worldSpaceCoords.y, worldSpaceCoords.z, 1 );
+			}
+		</script>
+		<script id="vertexShaderFirstPass" type="x-shader/x-vertex">
+			varying vec3 worldSpaceCoords;
+			
+			uniform float xdistance, ydistance, zdistance;
+			void main()
+			{
+				//Set the world space coordinates of the back faces vertices as output.
+				worldSpaceCoords = vec3(position.x/xdistance + 0.5, position.y/ydistance + 0.5, position.z/zdistance + 0.5); 
+				//move it from [-0.5;0.5] to [0,1]
+				//move it from [-(max-min)/2;  (max-min)/2] to [0,1]
+				
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}
+		</script>
+		<!-- vertx and frag shader use for main algorithm of raycasting, once i got the worldcoords of back and front from mesh geometry
+		full render the volume
+		-->
+		<script id="fragmentShaderSecondPass" type="x-shader/x-fragment">
+			//world space coords with back and front position
+			varying vec3 worldSpaceCoords;
+			//projection matrix from screen to mesh
+			varying vec4 projectedCoords;
+			//sample texture from screen, sample texture of volume, sample texture of tranferfucntion
+			uniform sampler2D backside,volumetex, transferTex;
+			uniform sampler2D transferpalette;
+			// size of volume maxZ (depth), maxX (width), maxY(height)
+			uniform float maxZ, maxX, maxY; 
+			// amount of voxel can i go trough each slice
+			uniform float steps;
+			// debug alpha
+			uniform float alphaFixed;
+
+
+			uniform vec3 ambientLightColor;
+			uniform vec3 directionalLightDirection;
+			varying mat4 mvMatrix;
+			varying mat4 pvMatrix;
+			varying vec3 vNormal,ligDir, eyeVec;
+			varying vec4 vVertex;
+
+			const int MAX_STEPS = 2048;
+
+
+			//Acts like a texture3D using Z slices and trilinear filtering.
+			//Actua como una textura3D, usa cortes en z y filtro trilinear
+			vec4 sampleAs3DTexture(sampler2D texturec, vec3 texCoord, float size) {
+			   float sliceSize = 1.0 / size;                         // space of 1 slice
+			   float slicePixelSize = sliceSize / size;              // space of 1 pixel
+			   float sliceInnerSize = slicePixelSize * (size - 1.0); // space of size pixels (interpolacion del primer corte)
+			   float zSlice0 = min(floor(texCoord.z * size), size - 1.0);
+			   float zSlice1 = min(zSlice0 + 1.0, size - 1.0);
+			   float xOffset = slicePixelSize * 0.5 + texCoord.x * sliceInnerSize;
+			   float s0 = xOffset + (zSlice0 * sliceSize);
+			   float s1 = xOffset + (zSlice1 * sliceSize);
+			   vec4 slice0Color = texture2D(texturec, vec2(s0, texCoord.y));
+			   vec4 slice1Color = texture2D(texturec, vec2(s1, texCoord.y));
+			
+
+			   float zOffset = mod(texCoord.z * size, 1.0);
+			   return mix(slice0Color, slice1Color, zOffset);
+			}	
+
+			
+			void main( void ) {
+
+				//phong-bling
+				
+
+				//Transform the coordinates it from [-1;1] to [0;1]
+				vec2 texc = vec2(((projectedCoords.x / projectedCoords.w)),
+								 ((projectedCoords.y / projectedCoords.w)));
+
+				// esto es para acceder a la textura trasera en donde están la salida del rayo en el volumen (la textura 3D)
+			    texc.x = 0.5*texc.x + 0.5;
+			    texc.y = 0.5*texc.y + 0.5;
+
+			    
+				//The back position is the world space position stored in the texture.
+				vec3 backPos = texture2D(backside, texc).xyz;
+
+				//The front position is the world space position of the second render pass.
+				vec3 frontPos = worldSpaceCoords;
+
+				//The direction from the front position to back position.
+				vec3 dir = vec3(0.0);
+				dir.x = backPos.x - frontPos.x;
+				dir.y = backPos.y - frontPos.y;
+				dir.z = backPos.z - frontPos.z;
+
+				float rayLength = length(dir.xyz); 
+				
+				vec3 norm_dir = normalize(dir);
+				//Calculate how long to increment in each step.
+				float delta = 1.0 / steps;
+
+				//The increment in each direction for each step.
+				vec3 deltaDirection = norm_dir * delta;
+				float deltaDirectionLength = length(deltaDirection);
+
+				//Start the ray casting from the front position.
+				vec3 currentPosition = frontPos.xyz;
+				vec3 currentbackpostion = backPos.xyz;
+				
+				//The color accumulator.
+				vec4 accumulatedColor = vec4(0,0,0,0);
+				
+				//The alpha value accumulated so far.
+				float accumulatedAlpha = 1.0;
+				
+				//How long has the ray travelled so far.
+				float accumulatedLength = 0.0;  
+				vec4 accumulatedLight = vec4(0,0,0,0);
+				vec4 colorSample;
+				vec4 colorSampleA, colorSampleB;
+				
+				float lambertian = 0.0;
+				float alphaSample = 0.0;
+				float specular= 0.0;
+
+				//Perform the ray marching iterations
+				for(int i = 0; i < 4096 ; i++)
+				{	
+					
+
+					//Get the voxel intensity value from the 3D texture.
+					colorSampleA = sampleAs3DTexture( volumetex, currentPosition, maxZ);
+					//colorSampleB = sampleAs3DTexture( volumetex, currentPosition+deltaDirection, maxZ);
+					vec4 SampleNormal =mvMatrix * vec4(normalize(colorSampleA.xyz),0.0);
+					vec3 N = normalize(SampleNormal.zyx);
+					vec3 L = normalize(ligDir);
+
+					lambertian = max(dot(N,L),0.0);
+					specular = 0.0;
+
+					if(lambertian > 0.0)
+					{
+						//Especular
+						vec3 E = normalize(-eyeVec);
+						vec3 H = normalize(L+E);
+						specular = specular = pow(max(dot(H, N), 0.0), 16.0);
+					}
+
+					colorSample  = texture2D(transferTex, vec2(colorSampleA.a,1.0));
+
+					accumulatedLight =  vec4(colorSample.rgb* (ambientLightColor+ lambertian+ specular),1.0);
+
+					
+					alphaSample = 1.0 - exp(-0.7 * colorSample.a);
+					
+					//Perform the composition.
+					accumulatedColor += accumulatedAlpha * alphaSample * accumulatedLight;
+					
+					//Store the alpha accumulated so far.
+					accumulatedAlpha *= 1.0-alphaSample;
+					
+					//Advance the ray.
+					currentPosition += deltaDirection;
+					//currentbackpostion-=deltaDirection;
+					accumulatedLength += deltaDirectionLength;
+							  
+					//If the length traversed is more than the ray length, or if the alpha accumulated reaches 1.0 then exit.
+					if ((accumulatedLength >= rayLength) || (1.0-accumulatedAlpha >= 0.9))
+						break;
+				}
+
+				gl_FragColor  = accumulatedColor;
+
+				if(gl_FragColor.a < 0.1)
+					discard;
+				  
+			}
+		</script>
+		
+		<script id="vertexShaderSecondPass" type="x-shader/x-vertex">
+			varying vec3 worldSpaceCoords;
+			varying vec4 projectedCoords;
+			varying mat4 mvMatrix;
+			varying mat4 pvMatrix;
+			varying vec4 vVertex;
+			varying vec3 vNormal,ligDir, eyeVec;
+
+			uniform vec3 directionalLightDirection;
+			uniform float xdistance, ydistance, zdistance;
+			
+			void main()
+			{
+
+				vNormal = normal;
+				vVertex =  modelViewMatrix * vec4(position,1.0);
+
+				eyeVec = (vec3(vVertex) / vVertex.w);
+
+				ligDir = directionalLightDirection - vVertex.xyz;
+
+				mvMatrix = modelViewMatrix;
+				pvMatrix = projectionMatrix;
+
+				worldSpaceCoords = vec3(position.x/xdistance + 0.5, position.y/ydistance + 0.5, position.z/zdistance + 0.5);
+				gl_Position = projectionMatrix *  modelViewMatrix * vec4( position, 1.0 );
+				projectedCoords =  projectionMatrix * modelViewMatrix  * vec4( position, 1.0 );
+				
+			}
+		</script>
+		<script src="js/scene_clean.js"></script>
+	</body>
+</html>
