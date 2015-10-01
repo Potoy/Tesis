@@ -34,5 +34,3 @@ Luego de estas opciones podemos sentrar el objeto o dibujarlo, la ocion de anima
 
 #Contribuidores
 
-
-#Licencia
