@@ -563,6 +563,7 @@ function init()
   container = document.getElementById('container-webgl');
   //algunas propiedades del rendeer
   renderer = new THREE.WebGLRenderer({ antialias: true });
+  //renderer.setClearColor(0xffffff,1)
   
   //activo extenciones para el uso del texturas en flotantes y el uso de filtros lineales sobre flotantes
   gl = renderer.getContext('webgl');
@@ -576,7 +577,7 @@ function init()
    }
 
   //inicializo la camara
-  camara = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 100000.0 );
+  camara = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.001, 100000.0 );
   camara.position.z = 2.0 * Math.pow(Math.pow((zmax-zmin),2)+Math.pow((xmax-xmin),2)+Math.pow((ymax-ymin),2),1/2);
 
   controls = new THREE.OrbitControls( camara, container );
@@ -649,7 +650,7 @@ function init()
   meshSecondPass = new THREE.Mesh( geometry, materialSecondPass);
   //boundign box del render
   bbox = new THREE.BoxHelper(meshSecondPass);
-  bbox.material.color = new THREE.Color("rgba(1,1,1,0.0)");
+  bbox.material.color = new THREE.Color("rgb(0,0,0)");
   //luces locales al render
   ambientLight = new THREE.AmbientLight(0x4A4A4A);
   directionalLight = new THREE.DirectionalLight(0x000000, 30);
