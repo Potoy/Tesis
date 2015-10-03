@@ -650,7 +650,7 @@ function init()
   meshSecondPass = new THREE.Mesh( geometry, materialSecondPass);
   //boundign box del render
   bbox = new THREE.BoxHelper(meshSecondPass);
-  bbox.material.color = new THREE.Color("rgb(0,0,0)");
+  bbox.material.color = new THREE.Color("rgb(256,256,256)");
   //luces locales al render
   ambientLight = new THREE.AmbientLight(0x4A4A4A);
   directionalLight = new THREE.DirectionalLight(0x000000, 30);
