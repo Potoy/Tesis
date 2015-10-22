@@ -105,10 +105,10 @@
 											 <div class="row-xs-6 well well-sm">
 											 	 <label class="radio-inline">
   														<input type="radio" name="inlineRadioOptions" id="Normal_f" value="option1">Normal
-												</label>
+												</label><!--
 												<label class="radio-inline">
   														<input type="radio" name="inlineRadioOptions" id="Simpson_f" value="option2">Simpson
-												</label>
+												</label>-->
 												<br>
 												<spam> Tamaño de la Textura</spam>
 												 <select class="form-control" id="texture_size">
@@ -172,7 +172,7 @@
 					<div class="modal-content">
 				        <div class="modal-header">
 				          <button type="button" class="close" data-dismiss="modal">&times;</button>
-				          <h4 class="modal-title">Mas Handlers para el Rango de Iso-Values</h4>
+				          <h4 class="modal-title">Mas Handlers para el Rango de Iso-Valores</h4>
 				        </div>
 				        <div class="modal-body well well-sm" style="padding: 3px;">
 				          
@@ -330,13 +330,12 @@
 
 					//Get the voxel intensity value from the 3D texture.
 					colorSampleA = sampleAs3DTexture( volumetex, currentPosition, maxZ);
-					//colorSampleB = sampleAs3DTexture( volumetex, currentPosition+deltaDirection, maxZ);
-					vec4 SampleNormal =mvMatrix * vec4(normalize(colorSampleA.xyz),0.0);
-					vec3 N = normalize(SampleNormal.zyx);
+					vec4 SampleNormal = pvMatrix * vec4(colorSampleA.xyz,0.0);
+					vec3 N = normalize(SampleNormal.xyz);
 					vec3 L = normalize(ligDir);
 
 					lambertian = max(dot(N,L),0.0);
-					specular = 0.0;
+					specular = 0.01;
 
 					if(lambertian > 0.0)
 					{
@@ -396,7 +395,7 @@
 
 				eyeVec = (vec3(vVertex) / vVertex.w);
 
-				ligDir = directionalLightDirection - vVertex.xyz;
+				ligDir = (eyeVec * vec3(1.0,0.0,-1.0)) - vVertex.xyz;
 
 				mvMatrix = modelViewMatrix;
 				pvMatrix = projectionMatrix;

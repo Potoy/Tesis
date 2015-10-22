@@ -264,6 +264,7 @@ $(document).ready()
         materialSecondPass.uniforms.ydistance.value = parseFloat(ymax-ymin);
         materialSecondPass.uniforms.zdistance.value = parseFloat(zmax-zmin);
       }
+      controls.reset();
       camara.position.z = 2.0 * Math.pow(Math.pow((zmax-zmin),2)+Math.pow((xmax-xmin),2)+Math.pow((ymax-ymin),2),1/2);
       geometry = new THREE.BoxGeometry( xmax-xmin, ymax-ymin, zmax-zmin );
       geometry.doubleSide = true;
@@ -271,8 +272,8 @@ $(document).ready()
       meshSecondPass = new THREE.Mesh(geometry,materialSecondPass);
       bbox = new THREE.BoxHelper(meshSecondPass);
       bbox.material.color.setRGB( 1, 1, 1 );
-      ambientLight = new THREE.AmbientLight(0x4A4A4A);
-      directionalLight = new THREE.DirectionalLight(0x000000, 30);
+      ambientLight = new THREE.AmbientLight(0xFFFFFFF);
+      directionalLight = new THREE.DirectionalLight(0x000000, 120);
       directionalLight.position.set(2, 2, 2);
       materialSecondPass.uniforms.directionalLightDirection.value = [directionalLight];
       sceneFirstPass.add(meshFirstPass);
@@ -328,7 +329,6 @@ $(document).ready()
     }else{ 
       anime_slider=false;
     }
-    console.log($togglebutton.hasClass('active'));
   });
 
 
@@ -339,13 +339,11 @@ $(document).ready()
  
 
   $('input:radio[id="Normal_f"]').on("click",function(){
-    console.log('chek thus');
      use_simpson = false;
      $('input:radio[id="Normal_f"]').prop('checked',true);
      updateTextures();
   });
   $('input:radio[id="Simpson_f"]').on("click",function(){
-    console.log('chek thas');
     use_simpson = true;
      $('input:radio[id="Simpson_f"]').prop('checked',true);
       updateTextures();
@@ -358,15 +356,11 @@ $(document).ready()
           easing:'linear',
           speed:'slow',
           step: function(now, fx){
-          //console.log(now/100);
           var maxin = fatherofAnimation.slider('option','max');
           var minin = fatherofAnimation.slider('option','min');
           var vall = maxin+minin;
-          console.log(vall);
           singleSliderProp.Position = (((now/100)*vall)-minin)/(maxin-minin);
-          //console.log(singleSliderProp.Position);
           singleSliderProp.Position = Math.floor(singleSliderProp.Position*table_size[pointer_to_table_size]);     
-          console.log(singleSliderProp.Position);
           updateTextures();
           //fatherofAnimation.slider('value',maxin*(now/100));
           },
@@ -385,16 +379,12 @@ $(document).ready()
           easing:'linear',
           speed:'slow',
           step: function(now, fx){
-           // console.log(now/100);
           var maxin = fatherofAnimation.slider('option','max');
           var minin = fatherofAnimation.slider('option','min');
           var vall = maxin+minin;
-          console.log(vall);
 
           singleSliderProp.Position = (((now/100)*vall)-minin)/(maxin-minin);
-         //    console.log(singleSliderProp.Position);
           singleSliderProp.Position = Math.floor(singleSliderProp.Position*table_size[pointer_to_table_size]);     
-          console.log(singleSliderProp.Position);
           updateTextures();
           },
           done: function()
@@ -431,7 +421,6 @@ $(document).ready()
     });
 
     $('#modal_button').on('click',function(){
-      console.log("in");
       
       $('li').each(function(index)
       {
@@ -450,10 +439,8 @@ $(document).ready()
       var arrayofNewProps = [];
       var arrayofNewValues = [];
       var count = $('li').length;
-      console.log(count);
       $('li').each(function(index){
           var transformm = ((Math.floor(($(this).children()[0].value)*(Mmax-Mmin))/(table_size[pointer_to_table_size]))+Mmin);
-          console.log($(this).children()[2].value);
           var result_color;
           if($(this).children()[2].value.indexOf('#')==-1)
           {
@@ -652,7 +639,7 @@ function init()
   bbox.material.color = new THREE.Color("rgba(1,1,1,0.0)");
   //luces locales al render
   ambientLight = new THREE.AmbientLight(0x4A4A4A);
-  directionalLight = new THREE.DirectionalLight(0x000000, 30);
+  directionalLight = new THREE.DirectionalLight(0x000000, 120);
   directionalLight.position.set(2, 2, 2);
   materialSecondPass.uniforms.directionalLightDirection.value = [directionalLight];
   
