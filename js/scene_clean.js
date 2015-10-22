@@ -131,7 +131,6 @@ SlidersProp = new SliderProps(224,10,'rgb(255,180,0)',0.1,1);
 sliderArray.push(SlidersProp);
 var mTransferFunc;
 
-console.log(sliderArray);
 //funcion para controlador principal de las capas
 var CreateSlider = function($slider, values)
 {
@@ -264,23 +263,23 @@ $(document).ready()
         materialSecondPass.uniforms.ydistance.value = parseFloat(ymax-ymin);
         materialSecondPass.uniforms.zdistance.value = parseFloat(zmax-zmin);
       }
+      controls.reset();
       camara.position.z = 2.0 * Math.pow(Math.pow((zmax-zmin),2)+Math.pow((xmax-xmin),2)+Math.pow((ymax-ymin),2),1/2);
       geometry = new THREE.BoxGeometry( xmax-xmin, ymax-ymin, zmax-zmin );
       geometry.doubleSide = true;
       meshFirstPass = new THREE.Mesh(geometry,materialFirstPass);
       meshSecondPass = new THREE.Mesh(geometry,materialSecondPass);
       bbox = new THREE.BoxHelper(meshSecondPass);
-      bbox.material.color.setRGB( 1, 1, 1 );
-      ambientLight = new THREE.AmbientLight(0x4A4A4A);
-      directionalLight = new THREE.DirectionalLight(0x000000, 30);
-      directionalLight.position.set(2, 2, 2);
-      materialSecondPass.uniforms.directionalLightDirection.value = [directionalLight];
+      bbox.material.color = new THREE.Color("rgb(255,255,255)");
+      ambientLight = new THREE.AmbientLight(0xFFFFFF);
+      directionalLight = new THREE.DirectionalLight(0xFFFFFF, 100);
+      directionalLight.position.copy(camara.position);
       sceneFirstPass.add(meshFirstPass);
       sceneSecondPass.add(meshSecondPass);
       sceneSecondPass.add(bbox);
       sceneSecondPass.add(ambientLight);
+      //camara.add(directionalLight);
       sceneSecondPass.add(directionalLight);
-      sceneSecondPass.needsUpdate = true;
       updateTextInput();
     });
 
@@ -328,7 +327,6 @@ $(document).ready()
     }else{ 
       anime_slider=false;
     }
-    console.log($togglebutton.hasClass('active'));
   });
 
 
@@ -339,13 +337,13 @@ $(document).ready()
  
 
   $('input:radio[id="Normal_f"]').on("click",function(){
-    console.log('chek thus');
+  
      use_simpson = false;
      $('input:radio[id="Normal_f"]').prop('checked',true);
      updateTextures();
   });
   $('input:radio[id="Simpson_f"]').on("click",function(){
-    console.log('chek thas');
+    
     use_simpson = true;
      $('input:radio[id="Simpson_f"]').prop('checked',true);
       updateTextures();
@@ -358,15 +356,14 @@ $(document).ready()
           easing:'linear',
           speed:'slow',
           step: function(now, fx){
-          //console.log(now/100);
           var maxin = fatherofAnimation.slider('option','max');
           var minin = fatherofAnimation.slider('option','min');
           var vall = maxin+minin;
-          console.log(vall);
+
           singleSliderProp.Position = (((now/100)*vall)-minin)/(maxin-minin);
-          //console.log(singleSliderProp.Position);
+    
           singleSliderProp.Position = Math.floor(singleSliderProp.Position*table_size[pointer_to_table_size]);     
-          console.log(singleSliderProp.Position);
+  
           updateTextures();
           //fatherofAnimation.slider('value',maxin*(now/100));
           },
@@ -385,16 +382,15 @@ $(document).ready()
           easing:'linear',
           speed:'slow',
           step: function(now, fx){
-           // console.log(now/100);
           var maxin = fatherofAnimation.slider('option','max');
           var minin = fatherofAnimation.slider('option','min');
           var vall = maxin+minin;
-          console.log(vall);
+    
 
           singleSliderProp.Position = (((now/100)*vall)-minin)/(maxin-minin);
-         //    console.log(singleSliderProp.Position);
+      
           singleSliderProp.Position = Math.floor(singleSliderProp.Position*table_size[pointer_to_table_size]);     
-          console.log(singleSliderProp.Position);
+         
           updateTextures();
           },
           done: function()
@@ -431,7 +427,7 @@ $(document).ready()
     });
 
     $('#modal_button').on('click',function(){
-      console.log("in");
+
       
       $('li').each(function(index)
       {
@@ -450,10 +446,10 @@ $(document).ready()
       var arrayofNewProps = [];
       var arrayofNewValues = [];
       var count = $('li').length;
-      console.log(count);
+      
       $('li').each(function(index){
           var transformm = ((Math.floor(($(this).children()[0].value)*(Mmax-Mmin))/(table_size[pointer_to_table_size]))+Mmin);
-          console.log($(this).children()[2].value);
+        
           var result_color;
           if($(this).children()[2].value.indexOf('#')==-1)
           {
@@ -563,7 +559,7 @@ function init()
   container = document.getElementById('container-webgl');
   //algunas propiedades del rendeer
   renderer = new THREE.WebGLRenderer({ antialias: true });
-  //renderer.setClearColor(0xffffff,1)
+  renderer.setClearColor(0xffffff,1)
   
   //activo extenciones para el uso del texturas en flotantes y el uso de filtros lineales sobre flotantes
   gl = renderer.getContext('webgl');
@@ -577,10 +573,11 @@ function init()
    }
 
   //inicializo la camara
-  camara = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.001, 100000.0 );
+  camara = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000.0 );
   camara.position.z = 2.0 * Math.pow(Math.pow((zmax-zmin),2)+Math.pow((xmax-xmin),2)+Math.pow((ymax-ymin),2),1/2);
 
   controls = new THREE.OrbitControls( camara, container );
+  controls.addEventListener( 'change', light_update );
   
   controls.update();
   //update en la interfaz para ver la ecuacion actual
@@ -650,11 +647,11 @@ function init()
   meshSecondPass = new THREE.Mesh( geometry, materialSecondPass);
   //boundign box del render
   bbox = new THREE.BoxHelper(meshSecondPass);
-  bbox.material.color = new THREE.Color("rgb(256,256,256)");
+  bbox.material.color = new THREE.Color("rgb(255,255,255)");
   //luces locales al render
-  ambientLight = new THREE.AmbientLight(0x4A4A4A);
-  directionalLight = new THREE.DirectionalLight(0x000000, 30);
-  directionalLight.position.set(2, 2, 2);
+  ambientLight = new THREE.AmbientLight(0xFFFFFF);
+  directionalLight = new THREE.DirectionalLight(0xFFFFFF, 100);
+  directionalLight.position.copy(camara.position);
   materialSecondPass.uniforms.directionalLightDirection.value = [directionalLight];
   
   sceneFirstPass.add( meshFirstPass );
@@ -662,7 +659,6 @@ function init()
   sceneSecondPass.add(bbox);
   sceneSecondPass.add(ambientLight);
   sceneSecondPass.add(directionalLight);
-  sceneSecondPass.needsUpdate = true;
   renderer.setPixelRatio(window.devicePixelRatio);
   container.appendChild( renderer.domElement);
 
@@ -679,6 +675,11 @@ function init()
 
   window.addEventListener('resize', onWindowResize, false);  
 }  
+
+function light_update()
+{
+    directionalLight.position.copy( camara.position );
+}
 
 // funcion principal para crear el render
 function create_volumetexture(f_volume,size,m,n,k)
@@ -838,73 +839,74 @@ function updateTransferFunction()
   var saltexture = new Uint8Array(TF_SIZE*TF_SIZE*4);
  
 
-if(anime_slider== true && use_simpson ==false) //uso de posclasificacion con animacion de 1 sola capa
-{ 
-    for(var i = 0; i<singleSliderProp.Width; i++){
-      data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4]  = singleSliderProp.Color.r;
-      data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+1]= singleSliderProp.Color.g;
-      data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+2]= singleSliderProp.Color.b;
-      data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+3]= singleSliderProp.Opacity;
-      data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4]  = singleSliderProp.Color.r*255;
-      data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+1]= singleSliderProp.Color.g*255;
-      data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+2]= singleSliderProp.Color.b*255;
-      data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+3]= singleSliderProp.Opacity*255;
-    }
-}
-else if(anime_slider == false && use_simpson ==false) // uso de posclasificacion sin animar
-{
-
-  for(var i = 0; i<sliderArray[referencePos].Width; i++){
-      data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4]  = sliderArray[referencePos].Color.r;
-      data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+1]= sliderArray[referencePos].Color.g;
-      data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+2]= sliderArray[referencePos].Color.b;
-      data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+3]= sliderArray[referencePos].Opacity;
-      data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4]  = sliderArray[referencePos].Color.r*255;
-      data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+1]= sliderArray[referencePos].Color.g*255;
-      data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+2]= sliderArray[referencePos].Color.b*255;
-      data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+3]= sliderArray[referencePos].Opacity*255;
+  if(anime_slider== true && use_simpson ==false) //uso de posclasificacion con animacion de 1 sola capa
+  { 
+      for(var i = 0; i<singleSliderProp.Width; i++){
+        data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4]  = singleSliderProp.Color.r;
+        data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+1]= singleSliderProp.Color.g;
+        data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+2]= singleSliderProp.Color.b;
+        data[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+3]= singleSliderProp.Opacity;
+        data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4]  = singleSliderProp.Color.r*255;
+        data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+1]= singleSliderProp.Color.g*255;
+        data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+2]= singleSliderProp.Color.b*255;
+        data2[(((singleSliderProp.Width/2)-i)+(singleSliderProp.Position))*4+3]= singleSliderProp.Opacity*255;
+      }
   }
-
-  for(var j =0 ; j < sliderArray.length; j++)
+  else if(anime_slider == false && use_simpson ==false) // uso de posclasificacion sin animar
   {
-    for(var i = 0; i<sliderArray[j].Width; i++){
-      data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4]  = sliderArray[j].Color.r;
-      data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+1]= sliderArray[j].Color.g;
-      data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+2]= sliderArray[j].Color.b;
-      data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+3]= sliderArray[j].Opacity;
-      data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4]  = sliderArray[j].Color.r*255;
-      data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+1]= sliderArray[j].Color.g*255;
-      data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+2]= sliderArray[j].Color.b*255;
-      data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+3]= sliderArray[j].Opacity*255;
+
+    for(var i = 0; i<sliderArray[referencePos].Width; i++){
+        data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4]  = sliderArray[referencePos].Color.r;
+        data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+1]= sliderArray[referencePos].Color.g;
+        data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+2]= sliderArray[referencePos].Color.b;
+        data[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+3]= sliderArray[referencePos].Opacity;
+        data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4]  = sliderArray[referencePos].Color.r*255;
+        data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+1]= sliderArray[referencePos].Color.g*255;
+        data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+2]= sliderArray[referencePos].Color.b*255;
+        data2[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))*4+3]= sliderArray[referencePos].Opacity*255;
     }
-  }
 
-} 
-else if(anime_slider == false && use_simpson == true) //uso de pre-integracion y no de posclasifciacion
-{ //dibujo el nodo actual
-  for(var i = 0; i<sliderArray[referencePos].Width; i++){
-       m_nodes[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))] = new CTFNode (sliderArray[referencePos].Color.r, sliderArray[referencePos].Color.g, sliderArray[referencePos].Color.b, sliderArray[referencePos].Opacity, sliderArray[referencePos].Opacity);
-  }
-
-  for(var j=0; j < sliderArray.length; j++)
-  {
-    for(var i = 0; i < sliderArray[j].Width ; i++)
+    for(var j =0 ; j < sliderArray.length; j++)
     {
-      m_nodes[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))] = new CTFNode (sliderArray[j].Color.r, sliderArray[j].Color.g, sliderArray[j].Color.b, sliderArray[j].Opacity, sliderArray[j].Opacity);
+      for(var i = 0; i<sliderArray[j].Width; i++){
+        data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4]  = sliderArray[j].Color.r;
+        data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+1]= sliderArray[j].Color.g;
+        data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+2]= sliderArray[j].Color.b;
+        data[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+3]= sliderArray[j].Opacity;
+        data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4]  = sliderArray[j].Color.r*255;
+        data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+1]= sliderArray[j].Color.g*255;
+        data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+2]= sliderArray[j].Color.b*255;
+        data2[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))*4+3]= sliderArray[j].Opacity*255;
+      }
     }
-  }
-  Preintegration_Adaptative(SimpsonAdaptativoText,1);
 
-  for(var j=0; j<TF_SIZE; j++ )
-  {  for(var i=0; i<TF_SIZE; i++)
+  } 
+  else if(anime_slider == false && use_simpson == true) //uso de pre-integracion y no de posclasifciacion
+  { //dibujo el nodo actual
+    for(var i = 0; i<sliderArray[referencePos].Width; i++)
     {
-      saltexture[j*TF_SIZE*4+i*4]  =SimpsonAdaptativoText[j*TF_SIZE*4+i*4]  *255;
-      saltexture[j*TF_SIZE*4+i*4+1]=SimpsonAdaptativoText[j*TF_SIZE*4+i*4+1]*255;
-      saltexture[j*TF_SIZE*4+i*4+2]=SimpsonAdaptativoText[j*TF_SIZE*4+i*4+2]*255;
-      saltexture[j*TF_SIZE*4+i*4+3]=SimpsonAdaptativoText[j*TF_SIZE*4+i*4+3]*255;
+         m_nodes[(((sliderArray[referencePos].Width/2)-i)+(sliderArray[referencePos].Position))] = new CTFNode (sliderArray[referencePos].Color.r, sliderArray[referencePos].Color.g, sliderArray[referencePos].Color.b, sliderArray[referencePos].Opacity, sliderArray[referencePos].Opacity);
+    }
+
+    for(var j=0; j < sliderArray.length; j++)
+    {
+      for(var i = 0; i < sliderArray[j].Width ; i++)
+      {
+        m_nodes[(((sliderArray[j].Width/2)-i)+(sliderArray[j].Position))] = new CTFNode (sliderArray[j].Color.r, sliderArray[j].Color.g, sliderArray[j].Color.b, sliderArray[j].Opacity, sliderArray[j].Opacity);
+      }
+    }
+    Preintegration_Adaptative(SimpsonAdaptativoText,1);
+
+    for(var j=0; j<TF_SIZE; j++ )
+    {  for(var i=0; i<TF_SIZE; i++)
+      {
+        saltexture[j*TF_SIZE*4+i*4]  =SimpsonAdaptativoText[j*TF_SIZE*4+i*4]  *255;
+        saltexture[j*TF_SIZE*4+i*4+1]=SimpsonAdaptativoText[j*TF_SIZE*4+i*4+1]*255;
+        saltexture[j*TF_SIZE*4+i*4+2]=SimpsonAdaptativoText[j*TF_SIZE*4+i*4+2]*255;
+        saltexture[j*TF_SIZE*4+i*4+3]=SimpsonAdaptativoText[j*TF_SIZE*4+i*4+3]*255;
+      }
     }
   }
-}
   if(use_simpson == true)
   texture2 = new THREE.DataTexture(SimpsonAdaptativoText, table_size[pointer_to_table_size], table_size[pointer_to_table_size], THREE.RGBAFormat, THREE.FloatType,THREE.UVMapping, THREE.ClampToEdgeWrapping,THREE.ClampToEdgeWrapping,THREE.NearestFilter,THREE.LinearFilter);
   else
@@ -922,7 +924,7 @@ else if(anime_slider == false && use_simpson == true) //uso de pre-integracion y
   else
   { _width2 = table_size[pointer_to_table_size];
     _height2 = 1; }
-  
+
   if(use_simpson ==true)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, _width2, _height2,0, gl.RGBA, gl.UNSIGNED_BYTE, saltexture );
   else
@@ -956,7 +958,7 @@ else if(anime_slider == false && use_simpson == true) //uso de pre-integracion y
     canvas.width = table_size[pointer_to_table_size];
     canvas.height = 1;
   }
-  
+
   var imageData;
   var context = canvas.getContext('2d');
   if(use_simpson == true)

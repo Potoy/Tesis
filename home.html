@@ -105,10 +105,10 @@
 											 <div class="row-xs-6 well well-sm">
 											 	 <label class="radio-inline">
   														<input type="radio" name="inlineRadioOptions" id="Normal_f" value="option1">Normal
-												</label>
+												</label><!--
 												<label class="radio-inline">
   														<input type="radio" name="inlineRadioOptions" id="Simpson_f" value="option2">Simpson
-												</label>
+												</label>-->
 												<br>
 												<spam> Tamaño de la Textura</spam>
 												 <select class="form-control" id="texture_size">
@@ -172,7 +172,7 @@
 					<div class="modal-content">
 				        <div class="modal-header">
 				          <button type="button" class="close" data-dismiss="modal">&times;</button>
-				          <h4 class="modal-title">Mas Handlers para el Rango de Iso-Values</h4>
+				          <h4 class="modal-title">Mas Handlers para el Rango de Iso-Valores</h4>
 				        </div>
 				        <div class="modal-body well well-sm" style="padding: 3px;">
 				          
@@ -269,9 +269,6 @@
 			
 			void main( void ) {
 
-				//phong-bling
-				
-
 				//Transform the coordinates it from [-1;1] to [0;1]
 				vec2 texc = vec2(((projectedCoords.x / projectedCoords.w)),
 								 ((projectedCoords.y / projectedCoords.w)));
@@ -297,7 +294,7 @@
 				
 				vec3 norm_dir = normalize(dir);
 				//Calculate how long to increment in each step.
-				float delta = 1.0 / steps;
+				float delta = 0.5 / steps;
 
 				//The increment in each direction for each step.
 				vec3 deltaDirection = norm_dir * delta;
@@ -312,12 +309,11 @@
 				
 				//The alpha value accumulated so far.
 				float accumulatedAlpha = 1.0;
-				
 				//How long has the ray travelled so far.
 				float accumulatedLength = 0.0;  
 				vec4 accumulatedLight = vec4(0,0,0,0);
 				vec4 colorSample;
-				vec4 colorSampleA, colorSampleB;
+				vec4 colorSampleA;
 				
 				float lambertian = 0.0;
 				float alphaSample = 0.0;
@@ -326,13 +322,10 @@
 				//Perform the ray marching iterations
 				for(int i = 0; i < 4096 ; i++)
 				{	
-					
-
 					//Get the voxel intensity value from the 3D texture.
 					colorSampleA = sampleAs3DTexture( volumetex, currentPosition, maxZ);
-					//colorSampleB = sampleAs3DTexture( volumetex, currentPosition+deltaDirection, maxZ);
-					vec4 SampleNormal =mvMatrix * vec4(normalize(colorSampleA.xyz),0.0);
-					vec3 N = normalize(SampleNormal.zyx);
+					vec4 SampleNormal = pvMatrix * vec4 (colorSampleA.xyz,1.0);
+					vec3 N = normalize(SampleNormal.xyz);
 					vec3 L = normalize(ligDir);
 
 					lambertian = max(dot(N,L),0.0);
@@ -347,33 +340,23 @@
 					}
 
 					colorSample  = texture2D(transferTex, vec2(colorSampleA.a,1.0));
-
 					accumulatedLight =  vec4(colorSample.rgb* (ambientLightColor+ lambertian+ specular),1.0);
-
-					
 					alphaSample = 1.0 - exp(-0.7 * colorSample.a);
-					
 					//Perform the composition.
 					accumulatedColor += accumulatedAlpha * alphaSample * accumulatedLight;
-					
 					//Store the alpha accumulated so far.
 					accumulatedAlpha *= 1.0-alphaSample;
-					
 					//Advance the ray.
 					currentPosition += deltaDirection;
 					//currentbackpostion-=deltaDirection;
-					accumulatedLength += deltaDirectionLength;
-							  
+					accumulatedLength += deltaDirectionLength;		  
 					//If the length traversed is more than the ray length, or if the alpha accumulated reaches 1.0 then exit.
 					if ((accumulatedLength >= rayLength) || (1.0-accumulatedAlpha >= 0.9))
 						break;
 				}
-
 				gl_FragColor  = accumulatedColor;
-
 				if(gl_FragColor.a < 0.1)
-					discard;
-				  
+					discard;  
 			}
 		</script>
 		
@@ -381,22 +364,24 @@
 			varying vec3 worldSpaceCoords;
 			varying vec4 projectedCoords;
 			varying mat4 mvMatrix;
+			varying mat4 nmMatrix;
 			varying mat4 pvMatrix;
 			varying vec4 vVertex;
 			varying vec3 vNormal,ligDir, eyeVec;
 
 			uniform vec3 directionalLightDirection;
+			vec3 lightDirection;
 			uniform float xdistance, ydistance, zdistance;
 			
 			void main()
 			{
 
-				vNormal = normal;
+				vNormal = normalize(normal);
+				//nmMatrix = transpose(inverse(modelViewMatrix));
 				vVertex =  modelViewMatrix * vec4(position,1.0);
-
 				eyeVec = (vec3(vVertex) / vVertex.w);
 
-				ligDir = directionalLightDirection - vVertex.xyz;
+				ligDir = directionalLightDirection- eyeVec;
 
 				mvMatrix = modelViewMatrix;
 				pvMatrix = projectionMatrix;
